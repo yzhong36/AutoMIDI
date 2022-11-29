@@ -1,10 +1,15 @@
-
-
 import numpy as np
 import mido as md
 import os
 
 def read_notes(midi_file):
+    '''
+    read notes in midi file in a numpy array. Reading ignored metamessages
+    and signature messages.
+
+    :param midi_file: a mido object of MIDI file input
+    :return notes: numpy array of notes in a midi file
+    '''
     notes = np.array([])
 
     # skip metadata track
@@ -27,7 +32,7 @@ def load_midi(file_path, read_range=1, by_instrument=False):
             reading file, nothing would change
     :by_instrument: boolean parameter to decide whether read in all or by 
             instrument
-    :return notes: dictionary of notes in midi files
+    :return notes: list of notes in midi files
     :return time: numpy array of song duration
     '''
     # check existence
