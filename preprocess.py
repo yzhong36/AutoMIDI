@@ -4,10 +4,22 @@ import numpy as np
 import mido as md
 import os
 
-def load_midi(file_path, range=1, by_instrument=False):
+def read_notes(midi_file):
+    notes = np.array([])
+
+    # skip metadata track
+    tracks = midi_file.tracks
+    for t in tracks:
+        for m in t:
+            if not m.is_meta and m.type == 'note_on':
+                n = m.note
+                notes = np.append(notes, n)
+    return notes
+
+def load_midi(file_path, read_range=1, by_instrument=False):
     '''
     load the midi dataset. The function automaticaly detect whether the input
-    is file or datapath. It also offers a option to read file(s) in all or by
+    is file or datapath. It also offers a option to read file(s) in one or by
     instruments.
 
     :param file_path: the file or directory to be read
@@ -15,25 +27,41 @@ def load_midi(file_path, range=1, by_instrument=False):
             reading file, nothing would change
     :by_instrument: boolean parameter to decide whether read in all or by 
             instrument
-    :return: numpy array of midi files
+    :return notes: dictionary of notes in midi files
+    :return time: numpy array of song duration
     '''
     # check existence
     if not os.path.exists(file_path):
         return print("file or path not found")
 
-    midi_data = None
+    notes = []
+    time = np.array([])
+
     if os.path.isfile(file_path):       
         # read a single file
-        print("Reading a song")
+        print("Reading a single song")
+        print(file_path)
+
         song_read = md.MidiFile(file_path)
-        return midi_data
+        # append time and notes
+        time = np.append(time, song_read.length)
+        notes += [read_notes(song_read)]
+
+        return notes, time
     
     # otherwise read a dir
     print("Reading a directory")
-    file_list = os.listdir(file_path)
-    read_range = range if range > 1 else len(file_list) 
-
+    
+    file_list = sorted(f for f in os.listdir(file_path) if not f.startswith("."))
+    read_range = read_range if read_range > 1 else len(file_list) 
+    
     for i in range(0,read_range):
-        midi_file = md.MidiFile(file_list[i])
+        midi_path = file_path + file_list[i]
+        print(midi_path)
+
+        song_read = md.MidiFile(midi_path)
+        # append time and notes for each song
+        time = np.append(time, song_read.length)
+        notes += [read_notes(song_read)]
         
-    return midi_data
+    return notes, time

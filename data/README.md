@@ -21,3 +21,9 @@ Thoese message with notes start with a flage note_on. It contains all details of
 - tokenized note
 - note velocity
 - duration(time)
+
+### Removed instances
+Some files were removed from the trainig dataset due to format issue. The following table collects the reason for removal.
+|Filename               | Removal Reason                   |
+| :---                  |              ---:                |
+| AffairInSanMiguel.mid | data byte must be in range 0..127|
