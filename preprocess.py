@@ -100,3 +100,25 @@ def instrument_convolution(instr_list):
         if convolved_instrument not in c_instr:
             c_instr += [convolved_instrument]
     return c_instr
+
+def get_details(midiFile):
+    tttime = 0
+    for t in midiFile.tracks:
+        for m in t:
+            tttime += m.time
+
+    tpb = midiFile.ticks_per_beat
+    num_bars = tttime / (tpb * 4)
+    print('total duration =', tttime, 'ticks per beat =', tpb, 'number of bars =', num_bars)
+
+    note_array = []
+    for t in midiFile.tracks:
+        for m in t:
+            if not m.is_meta and m.type in ['note_on']:
+                note_array += [m.note]
+
+    min_note = sorted(note_array)[0]
+    max_note = sorted(note_array)[-1]
+
+    print('lowest note =', min_note, 'highest note =', max_note)
+    return tttime, tpb, min_note, max_note, num_bars
